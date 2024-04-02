@@ -1,34 +1,28 @@
 package com.springmvc.entities;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-// This is a Employee Entity Class.
+import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
-
-
+//This is a Employee Entity Class.
 public class Employee {
 
 	private Integer employeeId;
 
 	private String name;
 
-	private Set<Skill> skills;
+	private Set<Skill> skills = new HashSet<>();
 
 	private Integer age;
 
 	private Double salary;
 	
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date birthDate;
+	private LocalDate birthDate;
 
 	public Employee() {
 	}
 
-	public Employee(String name, Set<Skill> skills, Integer age, Double salary, Date birthDate) {
+	public Employee(String name, Set<Skill> skills, Integer age, Double salary, LocalDate birthDate) {
 		this.name = name;
 		this.skills = skills;
 		this.age = age;
@@ -82,17 +76,11 @@ public class Employee {
 		this.salary = salary;
 	}
 
-	public Date getBirthDate() {
+	public LocalDate getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(Date birthDate) throws ParseException {
-//		System.out.println("SetDate");
-//		System.out.println("birthDate : " + birthDate.getDate());
-//		System.out.println("birthMonth : " + birthDate.getMonth());
-//		System.out.println("birthYear : " + birthDate.getYear());
-		this.birthDate = birthDate;// formatter.parse(birthDate.toString());
-		System.out.println("this.birthDate : " + this.birthDate);
+	public void setBirthDate(String birthDate) {
+		this.birthDate = LocalDate.parse(birthDate);
 	}
-
 }

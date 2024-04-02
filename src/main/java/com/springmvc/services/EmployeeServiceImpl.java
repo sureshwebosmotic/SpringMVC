@@ -1,9 +1,7 @@
 package com.springmvc.services;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.springmvc.dao.EmployeeDao;
 import com.springmvc.dao.EmployeeDaoImpl;
 import com.springmvc.entities.Employee;
@@ -22,31 +20,51 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public int insertEmployee(Employee employee) {
-		return employeeDao.insertEmployee(employee);
+		int rowInserted = 0;
+		int generatedId = employeeDao.insertEmployee(employee);
+		if(generatedId!=0) {
+			employee.getSkills().forEach(skill -> {
+				skill.setEmployeeId(generatedId);
+				skillService.insertSkill(skill);
+			});
+		}
+		return rowInserted;
 	}
 
 	@Override
 	public List<Employee> getAllEmployee() {
-		return employeeDao.getAllEmployees();
+		List<Employee> retrievedEmployees =  employeeDao.getAllEmployees();
+		if(!retrievedEmployees.isEmpty()) {
+			retrievedEmployees.forEach( employee -> employee.setSkills(skillService.selectSkillsEmployeeId(employee.getEmployeeId())));
+		}
+		return retrievedEmployees;
 	}
 
 	@Override
 	public Employee selectEmployee(Integer employeeId) {
-		return employeeDao.selectEmployee(employeeId);
+		Employee retrievedEmployee = employeeDao.selectEmployee(employeeId);
+		if(retrievedEmployee!=null) {
+			retrievedEmployee.setSkills(skillService.selectSkillsEmployeeId(employeeId));
+		}
+		return retrievedEmployee;
 	}
 
 	@Override
 	public int deleteEmployee(Integer employeeId) {
-		return employeeDao.deleteEmployee(employeeId);
+		int rowDeleted = skillService.deleteSkillByEmployeeId(employeeId);
+			rowDeleted += employeeDao.deleteEmployee(employeeId);
+		return rowDeleted;
 	}
 
 	@Override
-	public void updateEmployee(Employee employee){
-		employeeDao.updateEmployee(employee);
-		employee.getSkills().forEach(skill ->{
-			skill.setEmployeeId(employee.getEmployeeId());
-		});
-		skillService.updateSkill(employee);
+	public int updateEmployee(Employee employee){
+		int rowUpdated = employeeDao.updateEmployee(employee);
+		if(rowUpdated>0) {
+			employee.getSkills().forEach(skill ->{
+				skill.setEmployeeId(employee.getEmployeeId());
+			});
+			skillService.updateSkill(employee);
+		}
+		return rowUpdated;
 	}
-
 }

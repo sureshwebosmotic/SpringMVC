@@ -2,6 +2,7 @@ package com.springmvc.entities;
 
 //This is a Skill Entity Class.
 public class Skill {
+	
 	private Integer id;
 
 	private String name;
@@ -54,7 +55,4 @@ public class Skill {
 	public String toString() {
 		return name;
 	}
-
-	
-
 }

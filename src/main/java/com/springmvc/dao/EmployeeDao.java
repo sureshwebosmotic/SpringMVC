@@ -21,5 +21,4 @@ public interface EmployeeDao {
 
 	// delete the employee by employeeId
 	int deleteEmployee(int id);
-
 }

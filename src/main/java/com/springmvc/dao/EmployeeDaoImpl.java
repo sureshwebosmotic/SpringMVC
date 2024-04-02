@@ -2,29 +2,20 @@ package com.springmvc.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-
 import com.springmvc.entities.Employee;
+import com.springmvc.mapper.EmployeeRowMapper;
 
-//This is a EmployeeDaoImpl class which implements the methods to perform database related operations using jdbc.
+//This is a EmployeeDaoImpl class which implements the methods to perform database related operations using jdbcTemplate.
 public class EmployeeDaoImpl implements EmployeeDao {
 
 	private JdbcTemplate jdbcTemplate;
-	
-	@Autowired
-	private SkillDao skillDao;
 
 	public void setTemplate(JdbcTemplate jdbcTemplate) {    
 	    this.jdbcTemplate = jdbcTemplate;    
@@ -33,50 +24,27 @@ public class EmployeeDaoImpl implements EmployeeDao {
 	@Override
 	public Employee selectEmployee(int employeeId) {
 		String SELECT_EMPLOYEE_BY_ID = "select * from employee where employee_id =?";
-		Employee employee = jdbcTemplate.queryForObject(SELECT_EMPLOYEE_BY_ID, new Object[]{employeeId},new BeanPropertyRowMapper<Employee>(Employee.class));    
-		System.out.println(employee.getBirthDate());
-		employee.setSkills(skillDao.selectSkillsEmployeeId(employeeId));
+		Employee employee = jdbcTemplate.queryForObject(SELECT_EMPLOYEE_BY_ID, new Object[]{employeeId},new EmployeeRowMapper());    
 		return employee;
 	}
 
 	@Override
 	public List<Employee> getAllEmployees() {
-		return jdbcTemplate.query("select * from employee",new RowMapper<Employee>(){    
-	        public Employee mapRow(ResultSet resultSet, int row) throws SQLException {    
-	        	Employee employee = new Employee();
-	    		Integer employeeId = Integer.parseInt((resultSet.getString("employee_id")));
-	    		employee.setEmployeeId(employeeId);
-	    		employee.setName(resultSet.getString("name"));
-	    		employee.setAge(resultSet.getInt("age"));
-	    		employee.setSalary(resultSet.getDouble("salary"));
-	    		employee.setSkills(skillDao.selectSkillsEmployeeId(employeeId));
-	    		//employee.setBirthDate(resultSet.getDate("birth_date"));
-	    		
-	            return employee;    
-	        }    
-	    });    
+		List<Employee> retrievedEmployees = jdbcTemplate.query("select * from employee",new EmployeeRowMapper());   
+		return retrievedEmployees;
 	}
 
 	@Override
 	public int insertEmployee(Employee employee) {
-		System.out.println("Dao");
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		String INSERT_EMPLOYEES_SQL = "INSERT INTO employee" + "  (name, age, salary, birth_date) VALUES ('"+employee.getName()+"','"+employee.getAge()+"','"+employee.getSalary()+"','"+employee.getBirthDate()+"');";
-		int rowInserted = jdbcTemplate.update(
+		jdbcTemplate.update(
 				  new PreparedStatementCreator() {
 				    public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
 				      return connection.prepareStatement(INSERT_EMPLOYEES_SQL, Statement.RETURN_GENERATED_KEYS);
 				    }
 				  }, keyHolder);
-		
-		if(keyHolder.getKey().intValue()!=0) {
-			employee.getSkills().forEach(skill -> {
-				skill.setEmployeeId(keyHolder.getKey().intValue());
-				skillDao.insertSkill(skill);
-			});
-			
-		}
-		return rowInserted;
+		return keyHolder.getKey().intValue();
 	}
 
 	@Override
@@ -91,9 +59,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
 	public int deleteEmployee(int id) {
 		String DELETE_EMPLOYEE_SQL = "delete from employee where employee_id = "+id+";";
 		int rowdeleted = 0;
-		rowdeleted = skillDao.deleteSkillByEmployeeId(id);
-		rowdeleted += jdbcTemplate.update(DELETE_EMPLOYEE_SQL);
-		
+		rowdeleted = jdbcTemplate.update(DELETE_EMPLOYEE_SQL);
 		return rowdeleted;
 	}
 }

@@ -2,13 +2,11 @@ package com.springmvc.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import org.springframework.jdbc.core.RowMapper;
-
 import com.springmvc.entities.Skill;
 
+//This is a RowMapper class which maps the db tables rows to field of java object
 public class SkillRowMapper implements RowMapper<Skill>{
-
 	@Override
 	public Skill mapRow(ResultSet rs, int rowNum) throws SQLException {
 		Skill employee = new Skill();
@@ -18,5 +16,4 @@ public class SkillRowMapper implements RowMapper<Skill>{
 		employee.setEmployeeId(rs.getInt("employee_fid"));
         return employee; 
 	}
-
 }

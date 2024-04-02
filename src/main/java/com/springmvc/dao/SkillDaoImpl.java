@@ -1,18 +1,9 @@
 package com.springmvc.dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-
-import com.springmvc.entities.Employee;
 import com.springmvc.entities.Skill;
 import com.springmvc.mapper.SkillRowMapper;
 
@@ -25,7 +16,6 @@ public class SkillDaoImpl implements SkillDao {
 	    this.jdbcTemplate = jdbcTemplate;    
 	} 
 	
-	
 	// save the skill.
 	public int insertSkill(Skill skill) {
 		String INSERT_SKILL_SQL = "INSERT INTO skill" + "  (name, employee_fid) VALUES " + " ('"+skill.getName()+"', '"+skill.getEmployeeId()+"');";
@@ -35,7 +25,6 @@ public class SkillDaoImpl implements SkillDao {
 
 	@Override
 	public Set<Skill> getAllSkills() {
-		
 		List<Skill> retriveSkills = jdbcTemplate.query("select * from skill",new SkillRowMapper());  
 		Set<Skill> skills = new HashSet<>(retriveSkills);
 		return skills;

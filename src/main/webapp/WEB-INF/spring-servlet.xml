@@ -49,5 +49,4 @@
 	<bean id="employeeController" class="com.springmvc.controller.EmployeeController"> 
 		<property name="employeeService" ref="employeeService"></property>
 	</bean>
-	
 </beans>

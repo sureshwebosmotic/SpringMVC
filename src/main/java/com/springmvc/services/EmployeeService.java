@@ -1,12 +1,11 @@
 package com.springmvc.services;
 
 import java.util.List;
-
 import com.springmvc.entities.Employee;
 
 // This is EmployeeService interface which is use to define service methods.
 public interface EmployeeService {
-
+	
 	// save the employee.
 	public int insertEmployee(Employee employee);
 
@@ -20,5 +19,5 @@ public interface EmployeeService {
 	public int deleteEmployee(Integer employeeId);
 
 	// update the employee
-	public void updateEmployee(Employee employee);
+	public int updateEmployee(Employee employee);
 }
